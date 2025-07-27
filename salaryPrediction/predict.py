@@ -1,7 +1,7 @@
 import streamlit as st
 import numpy as np
 import pickle
-
+import os
 # Load model and encoders
 @st.cache_resource
 def load_all():
@@ -11,7 +11,13 @@ def load_all():
         encoders = pickle.load(f)
     return model, encoders
 
-model, encoders = load_all()
+def load_all():
+    dir_path = os.path.dirname(__file__)  # Gets path to current file
+    with open(os.path.join(dir_path, "salary_model.pkl"), "rb") as f:
+        model = pickle.load(f)
+    with open(os.path.join(dir_path, "label_encoders.pkl"), "rb") as f:
+        encoders = pickle.load(f)
+    return model, encoders
 
 def show_predict_page():
     st.set_page_config(page_title="Predict", layout="centered")
