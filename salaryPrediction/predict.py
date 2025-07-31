@@ -7,14 +7,14 @@ def show_predict_page():
     st.set_page_config(page_title="Predict", layout="centered")
     st.title("🎯 Predict Your Estimated Salary")
 
-    # Load model and encoders INSIDE the function with error handling
-    try:
-        model = joblib.load("salary_model.pkl")
-        encoders = joblib.load("label_encoders.pkl")
-    except Exception as e:
-        st.error(f"Model or encoder files not found or failed to load: {e}")
-        st.stop()
-        return  # Ensure function exits if loading fails
+    # Debug: print current working directory and files
+    st.write("Current working directory:", os.getcwd())
+    st.write("Files in directory:", os.listdir())
+    st.write("Looking for: salary_model.pkl and label_encoders.pkl")
+
+    # Load model and encoders WITHOUT try/except
+    model = joblib.load("salary_model.pkl")
+    encoders = joblib.load("label_encoders.pkl")
 
     st.markdown("Fill out the form below to get your salary prediction.")
 
@@ -74,6 +74,13 @@ def show_predict_page():
             with st.expander("📋 View Input Summary"):
                 st.write(f"**Country:** {country}")
                 st.write(f"**Education:** {education}")
+                st.write(f"**Years of Experience:** {experience}")
+                st.write(f"**Dev Role:** {dev_type}")
+                st.write(f"**Org Size:** {org_size}")
+                st.write(f"**Remote Work:** {remote_work}")
+
+        except Exception as e:
+            st.error(f"Something went wrong: {e}")
                 st.write(f"**Years of Experience:** {experience}")
                 st.write(f"**Dev Role:** {dev_type}")
                 st.write(f"**Org Size:** {org_size}")

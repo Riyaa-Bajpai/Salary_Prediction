@@ -2,15 +2,22 @@ import streamlit as st
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import os
 
 def show_insights_page():
     # Page config
     st.set_page_config(page_title="Insights", layout="wide")
     st.title("📊 Salary Insights & Trends")
 
-    # Load data
+    # Debug: print current working directory and files
+    st.write("Current working directory:", os.getcwd())
+    st.write("Files in directory:", os.listdir())
+    st.write("Looking for: cleaned_data.csv and feature_imp.csv")
+
+    # Load data WITHOUT try/except
     df = pd.read_csv('cleaned_data.csv')
     feature_df = pd.read_csv('feature_imp.csv')
+
     df['CountryName'] = df['CountryName'].replace({"United Kingdom of Great Britain and Northern Ireland": "United Kingdom"})
 
     # Top KPIs
@@ -67,6 +74,12 @@ def show_insights_page():
     top_feats = feature_df[feature_df['Importance'] > 0.01].sort_values(by='Importance', ascending=True)
 
     fig5, ax5 = plt.subplots(figsize=(8, 5))
+    sns.barplot(data=top_feats, x='Importance', y='Feature', ax=ax5, palette='viridis')
+    st.pyplot(fig5)
+
+    # End note
+    st.markdown("---")
+    st.caption("Data source: StackOverflow Developer Survey (cleaned and modeled)")
     sns.barplot(data=top_feats, x='Importance', y='Feature', ax=ax5, palette='viridis')
     st.pyplot(fig5)
 
