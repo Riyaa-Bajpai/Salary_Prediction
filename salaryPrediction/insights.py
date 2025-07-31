@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import seaborn as sns
@@ -73,3 +74,5 @@ def show_insights_page():
     # End note
     st.markdown("---")
     st.caption("Data source: StackOverflow Developer Survey (cleaned and modeled)")
+    st.caption("Developed by: Riya Bajpai")
+    st.caption("IBM PBEL (Project-Based Experiential Learning) Internship – Salary Prediction (July 2025)")
