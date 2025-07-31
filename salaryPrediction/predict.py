@@ -66,6 +66,10 @@ def show_predict_page():
 
             st.success("🎉 Prediction Complete!")
             st.markdown(f"### 💰 Estimated Salary: **${salary:,.2f}**")
+            st.caption("Data source: StackOverflow Developer Survey (cleaned and modeled)")
+            st.caption("Developed by: Riya Bajpai")
+            st.caption("IBM PBEL (Project-Based Experiential Learning) Internship – Salary Prediction (July 2025)")
+
 
             with st.expander("📋 View Input Summary"):
                 st.write(f"**Country:** {country}")
