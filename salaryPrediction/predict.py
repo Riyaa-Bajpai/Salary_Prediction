@@ -80,7 +80,7 @@ def show_predict_page():
                 st.write(f"**Remote Work:** {remote_work}")
 
         except Exception as e:
-            st.error(f"Something went wrong: {e}")
+                st.error(f"Something went wrong: {e}")
                 st.write(f"**Years of Experience:** {experience}")
                 st.write(f"**Dev Role:** {dev_type}")
                 st.write(f"**Org Size:** {org_size}")
