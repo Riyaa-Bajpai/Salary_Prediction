@@ -1,31 +1,24 @@
-import streamlit as st
-import numpy as np
-import pickle
-import os
-# Load model and encoders
-@st.cache_resource
-def load_all():
-    with open("salary_model.pkl", "rb") as f:
-        model = pickle.load(f)
-    with open("label_encoders.pkl", "rb") as f:
-        encoders = pickle.load(f)
-    return model, encoders
-
-def load_all():
-    dir_path = os.path.dirname(__file__)  # Gets path to current file
-    with open(os.path.join(dir_path, "salary_model.pkl"), "rb") as f:
-        model = pickle.load(f)
-    with open(os.path.join(dir_path, "label_encoders.pkl"), "rb") as f:
-        encoders = pickle.load(f)
-    return model, encoders
-
 def show_predict_page():
+    import streamlit as st
+    import numpy as np
+    import joblib
+    import os
+
     st.set_page_config(page_title="Predict", layout="centered")
     st.title("🎯 Predict Your Estimated Salary")
 
+    # Load model and encoders INSIDE the function with error handling
+    try:
+        model = joblib.load("salary_model.pkl")
+        encoders = joblib.load("label_encoders.pkl")
+    except Exception as e:
+        st.error(f"Model or encoder files not found or failed to load: {e}")
+        st.stop()
+        return  # Ensure function exits if loading fails
+
     st.markdown("Fill out the form below to get your salary prediction.")
 
-    # Get encoder class labels
+    # Now this will work as encoders is defined
     countries = list(encoders['country'].classes_)
     education_levels = list(encoders['education'].classes_)
     dev_roles = list(encoders['dev'].classes_)
@@ -43,6 +36,7 @@ def show_predict_page():
 
         with col2:
             dev_type = st.selectbox("💻 Designation", dev_roles)
+
             def extract_lower_bound(size_str):
                 try:
                     return int(size_str.split()[0])
@@ -50,19 +44,15 @@ def show_predict_page():
                     return float('inf')
 
             org_sizes_sorted = sorted(org_sizes, key=extract_lower_bound)
-
             org_size = st.selectbox("🏢 Organization Size", org_sizes_sorted)
 
             remote_work = st.selectbox("🏠 Remote Work Preference", remote_opts)
-
-
 
         submitted = st.form_submit_button("🔮 Predict Salary")
 
     # Predict on submit
     if submitted:
         try:
-            # Encode inputs
             X = [
                 encoders['country'].transform([country])[0],
                 encoders['education'].transform([education])[0],
@@ -80,7 +70,7 @@ def show_predict_page():
 
             st.success("🎉 Prediction Complete!")
             st.markdown(f"### 💰 Estimated Salary: **${salary:,.2f}**")
-            
+
             with st.expander("📋 View Input Summary"):
                 st.write(f"**Country:** {country}")
                 st.write(f"**Education:** {education}")
