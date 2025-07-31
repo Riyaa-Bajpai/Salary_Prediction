@@ -3,7 +3,6 @@ import numpy as np
 import pickle
 import os
 
-# Load model and encoders only once
 @st.cache_resource
 def load_all():
     dir_path = os.path.dirname(__file__)
@@ -13,22 +12,20 @@ def load_all():
         encoders = pickle.load(f)
     return model, encoders
 
-# Load globally
-model, encoders = load_all()
-
 def show_predict_page():
     st.set_page_config(page_title="Predict", layout="centered")
     st.title("🎯 Predict Your Estimated Salary")
     st.markdown("Fill out the form below to get your salary prediction.")
 
-    # Get encoder class labels
+    # Load model and encoders here inside the function
+    model, encoders = load_all()
+
     countries = list(encoders['country'].classes_)
     education_levels = list(encoders['education'].classes_)
     dev_roles = list(encoders['dev'].classes_)
     org_sizes = list(encoders['orgsize'].classes_)
     remote_opts = list(encoders['remote'].classes_)
 
-    # Form
     with st.form("prediction_form"):
         col1, col2 = st.columns(2)
 
@@ -48,15 +45,12 @@ def show_predict_page():
 
             org_sizes_sorted = sorted(org_sizes, key=extract_lower_bound)
             org_size = st.selectbox("🏢 Organization Size", org_sizes_sorted)
-
             remote_work = st.selectbox("🏠 Remote Work Preference", remote_opts)
 
         submitted = st.form_submit_button("🔮 Predict Salary")
 
-    # Predict on submit
     if submitted:
         try:
-            # Encode inputs
             X = [
                 encoders['country'].transform([country])[0],
                 encoders['education'].transform([education])[0],
@@ -67,14 +61,12 @@ def show_predict_page():
             ]
 
             X = np.array(X).reshape(1, -1)
-
-            # Predict and inverse log
             pred_log_salary = model.predict(X)[0]
             salary = np.expm1(pred_log_salary)
 
             st.success("🎉 Prediction Complete!")
             st.markdown(f"### 💰 Estimated Salary: **${salary:,.2f}**")
-            
+
             with st.expander("📋 View Input Summary"):
                 st.write(f"**Country:** {country}")
                 st.write(f"**Education:** {education}")
