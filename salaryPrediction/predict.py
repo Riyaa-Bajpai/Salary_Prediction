@@ -2,27 +2,23 @@ import streamlit as st
 import numpy as np
 import pickle
 import os
-# Load model and encoders
+
+# Load model and encoders only once
 @st.cache_resource
 def load_all():
-    with open("salary_model.pkl", "rb") as f:
-        model = pickle.load(f)
-    with open("label_encoders.pkl", "rb") as f:
-        encoders = pickle.load(f)
-    return model, encoders
-
-def load_all():
-    dir_path = os.path.dirname(__file__)  # Gets path to current file
+    dir_path = os.path.dirname(__file__)
     with open(os.path.join(dir_path, "salary_model.pkl"), "rb") as f:
         model = pickle.load(f)
     with open(os.path.join(dir_path, "label_encoders.pkl"), "rb") as f:
         encoders = pickle.load(f)
     return model, encoders
 
+# Load globally
+model, encoders = load_all()
+
 def show_predict_page():
     st.set_page_config(page_title="Predict", layout="centered")
     st.title("🎯 Predict Your Estimated Salary")
-
     st.markdown("Fill out the form below to get your salary prediction.")
 
     # Get encoder class labels
@@ -43,6 +39,7 @@ def show_predict_page():
 
         with col2:
             dev_type = st.selectbox("💻 Designation", dev_roles)
+
             def extract_lower_bound(size_str):
                 try:
                     return int(size_str.split()[0])
@@ -50,12 +47,9 @@ def show_predict_page():
                     return float('inf')
 
             org_sizes_sorted = sorted(org_sizes, key=extract_lower_bound)
-
             org_size = st.selectbox("🏢 Organization Size", org_sizes_sorted)
 
             remote_work = st.selectbox("🏠 Remote Work Preference", remote_opts)
-
-
 
         submitted = st.form_submit_button("🔮 Predict Salary")
 
